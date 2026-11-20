@@ -701,14 +701,14 @@ const SCENARIOS = [
   { section: '5 · Actions', items: [
     { id: 'a-buttons', name: 'Buttons on the highlighted row', values: {}, query: 'cmmc assessment evid', hi: 1, about: { title: 'Buttons on the highlighted row', body: 'Use ↓ to move. The date swaps for buttons on the highlighted row. Press → for every action.', works: 'Easy to see; works with mouse and keys.', watch: 'Room for three buttons at most.' } },
     { id: 'a-ai-icon', name: 'Ask AI as an icon, like the other actions', values: { 'ai.buttonStyle': 'Icon with tooltip' }, query: 'cmmc assessment evid', hi: 3, about: { title: 'Ask AI as an icon', body: 'Ask AI is the first button on the highlighted row, as a sparkle icon with a tooltip, styled like the other actions.', works: 'Consistent and compact; leaves room for more actions.', watch: 'The sparkle alone may not say “AI” to everyone, and it’s easy to miss that AI is there.' } },
-    { id: 'a-ai-label', name: 'Ask AI as a labeled button', values: { 'ai.buttonStyle': 'Labeled button' }, query: 'cmmc assessment evid', hi: 3, about: { title: 'Ask AI as a labeled button', body: 'Same position, first on the row, but with the words “Ask AI”.', works: 'Says exactly what it does, so using AI (and its token cost) is a clear choice.', watch: 'Takes more room and draws more attention than the actions next to it.' } },
+    { id: 'a-ai-label', name: 'Ask AI as a labeled button', values: { 'ai.buttonStyle': 'Labeled button' }, query: 'cmmc assessment evid', hi: 3, about: { title: 'Ask AI as a labeled button', body: 'Same position, first on the row, but with the words “Ask AI”.', works: 'Says exactly what it does.', watch: 'Takes more room and draws more attention than the actions next to it.' } },
     { id: 'a-list', name: '→ for an action list', values: { 'results.actions': '→ for an action list' }, query: 'cmmc assessment evid', hi: 1, about: { title: 'Press → for an action list', body: 'Highlight a row and press →. The menu turns into its actions. ← goes back.', works: 'Every action reachable without a mouse.', watch: 'Nobody finds → on their own.' } },
     { id: 'a-more', name: '⋯ menu, changes by type', values: { 'results.actions': '⋯ menu on the row' }, query: 'cmmc assessment evid', hi: 1, about: { title: 'The menu changes with the type of result', body: 'Open ⋯ on a PreVeil file, then on the Slack row or the Kiwi trip. Anything that leaves PreVeil names the app.', works: 'People see before clicking whether they stay in PreVeil.' } },
     { id: 'a-preview', name: 'Preview beside the menu', values: { 'results.actions': 'Preview beside the menu' }, query: 'cmmc assessment evid', about: { title: 'Preview beside the menu', body: 'Highlighting a result shows a preview with the passage that matched.', works: 'Check it’s the right file before opening it.', watch: 'About 1000px wide; decrypting on every arrow key may be slow.' } },
     { id: 'a-src1', name: 'Source under the date', values: {}, query: 'cmmc assessment evid', about: { title: 'Source under the date', body: 'The source sits under the date on every row.', works: 'Quiet, and lines up so people can scan down the sources.', watch: 'Says where it is from, not where clicking takes you.' } },
     { id: 'a-src2', name: 'Source and location in the second line', values: { 'results.source': 'In the second line' }, query: 'cmmc assessment evid', about: { title: 'Source and location in the second line', body: 'The second line starts with the source and where it lives.', works: 'Answers “and the source”: the folder or channel.', watch: 'Less of the matched passage shows.' } },
     { id: 'a-src3', name: 'Mark what leaves PreVeil', values: { 'results.source': 'Mark what leaves PreVeil' }, query: 'cmmc assessment evid', hi: 2, about: { title: 'Mark anything that leaves PreVeil', body: 'Outside sources get an open-in-app icon. The highlighted row says where it opens.', works: 'Answers “where will this take me” at the moment of choosing.', watch: 'With many connected apps, most rows get the icon.' } },
-    { id: 'a-aiq', name: 'Ask AI about the search', values: { 'ai.inMenu': 'Also about the search' }, query: 'what evidence is missing for the assessment?', about: { title: 'Ask AI about the search', body: 'When the search reads like a question, the last row offers to ask AI.', watch: 'Many searches look like questions, so this could get used a lot. AI never runs until someone clicks.' } },
+    { id: 'a-aiq', name: 'Ask AI about the search', values: { 'ai.inMenu': 'Also about the search' }, query: 'what evidence is missing for the assessment?', about: { title: 'Ask AI about the search', body: 'When the search reads like a question, the last row offers to ask AI.', watch: 'Many searches look like questions, so this row would show up often.' } },
     { id: 'a-noai', name: 'No AI in the menu', values: { 'ai.inMenu': 'Not in the menu' }, query: 'cmmc assessment evid', hi: 1, about: { title: 'No AI in the menu', body: 'The menu only finds things. Ask AI lives on the results page and in the AI tab.', watch: 'One extra step to get to AI.' } },
     { id: 'a-cad', name: 'When Ask AI isn’t available', values: {}, query: 'guidance housing', hi: 0, about: { title: 'A CAD drawing', body: 'Search finds it by name but can’t read inside, so Ask AI is shown but blocked, with the reason.' } },
   ] },
@@ -1005,7 +1005,7 @@ function resultsHtml() {
   }
   if (V.ai === 'Also about the search' && /^(what|how|which|does|do|is|are|where|who|why|can)\b|\?$/.test(q.trim().toLowerCase())) {
     const i = navPush({ kind: 'askai' });
-    h += `<div class="divider"></div><div class="frow ${S.hi === i ? 'hi' : ''}" data-nav="${i}" data-askai>${ic('sparkles')}<span class="grow">Ask AI: <b>${esc(q.trim())}</b></span><span class="k">Runs only when you click</span></div>`;
+    h += `<div class="divider"></div><div class="frow ${S.hi === i ? 'hi' : ''}" data-nav="${i}" data-askai>${ic('sparkles')}<span class="grow">Ask AI: <b>${esc(q.trim())}</b></span></div>`;
   }
   h += seeAllHtml(`See all ${total} results for “${q.trim()}”`, null);
   return h;
@@ -1138,7 +1138,7 @@ function activate(i) {
   else if (e.kind === 'action') toast(e.a.disabled ? e.a.label : `Would do: ${e.a.label}`);
   else if (e.kind === 'refine') { S.refine = S.refine === e.label ? null : e.label; S.hi = -1; render(); }
   else if (e.kind === 'scopeFolder') { S.scopeFolder = true; render(); }
-  else if (e.kind === 'askai') toast('Would open the AI panel with this question. AI runs only now, after the click.');
+  else if (e.kind === 'askai') toast('Would open the AI side panel with this question and suggested topics');
 }
 $('menu').addEventListener('mousedown', e => e.preventDefault()); // keep focus in the input
 $('menu').addEventListener('click', e => {
@@ -1160,7 +1160,7 @@ $('menu').addEventListener('click', e => {
     const row = act.closest('[data-item]'); const id = row && row.dataset.item;
     if (act.dataset.act === 'more') { S.moreFor = S.moreFor === id ? null : id; render(); Tour.event('more'); return; }
     const it = ITEMS.find(x => x.id === id) || {};
-    const msgs = { open: `Would open “${it.t}” in ${openLabel(it)}`, preview: `Would preview “${it.t}”`, folder: 'Would show it in its folder', reply: 'Would start a reply', ai: `Would open the AI panel about “${it.t}”`, aiblocked: 'Search can’t read inside CAD drawings, so AI can’t either.' };
+    const msgs = { open: `Would open “${it.t}” in ${openLabel(it)}`, preview: `Would preview “${it.t}”`, folder: 'Would show it in its folder', reply: 'Would start a reply', ai: `Would open the AI side panel about “${it.t}” with suggested topics`, aiblocked: 'Search can’t read inside CAD drawings, so AI can’t either.' };
     toast(msgs[act.dataset.act]); return;
   }
   const al = t.closest('[data-act-label]'); if (al) { toast('Would do: ' + al.dataset.actLabel); S.moreFor = null; render(); return; }
