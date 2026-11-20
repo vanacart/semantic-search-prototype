@@ -1,5 +1,7 @@
 # Semantic Search — clickable prototypes
 
+A living prototype to explore how semantic search should integrate into our product.
+
 PreVeil design team prototypes for semantic search. Each runs by opening its HTML file in a browser — no build step.
 
 | Prototype | File | Status |
