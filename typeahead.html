@@ -642,7 +642,6 @@ function readVariants() {
   V.dym = DesignRail.variant('typing.didYouMean', { label: 'Did you mean', group: '4 · Did you mean', options: ['Off: match through typos quietly', 'Live while typing'] });
   V.source = DesignRail.variant('results.source', { label: 'Where it is from', group: '5 · Actions', options: ['Under the date', 'In the second line', 'Mark what leaves PreVeil'] });
   V.actions = DesignRail.variant('results.actions', { label: 'Reaching actions', group: '5 · Actions', options: ['Buttons on the highlighted row', '→ for an action list', '⋯ menu on the row', 'Preview beside the menu'] });
-  V.aiStyle = DesignRail.variant('ai.buttonStyle', { label: 'Ask AI button', group: '5 · Actions', options: ['Icon with tooltip', 'Labeled button'] });
   V.ai = DesignRail.variant('ai.inMenu', { label: 'Ask AI in the menu', group: '5 · Actions', options: ['On one result', 'Also about the search', 'Not in the menu'] });
 }
 
@@ -700,8 +699,6 @@ const SCENARIOS = [
   ] },
   { section: '5 · Actions', items: [
     { id: 'a-buttons', name: 'Buttons on the highlighted row', values: {}, query: 'cmmc assessment evid', hi: 1, about: { title: 'Buttons on the highlighted row', body: 'Use ↓ to move. The date swaps for buttons on the highlighted row. Press → for every action.', works: 'Easy to see; works with mouse and keys.', watch: 'Room for three buttons at most.' } },
-    { id: 'a-ai-icon', name: 'Ask AI as an icon, like the other actions', values: { 'ai.buttonStyle': 'Icon with tooltip' }, query: 'cmmc assessment evid', hi: 3, about: { title: 'Ask AI as an icon', body: 'Ask AI is the first button on the highlighted row, as a sparkle icon with a tooltip, styled like the other actions.', works: 'Consistent and compact; leaves room for more actions.', watch: 'The sparkle alone may not say “AI” to everyone, and it’s easy to miss that AI is there.' } },
-    { id: 'a-ai-label', name: 'Ask AI as a labeled button', values: { 'ai.buttonStyle': 'Labeled button' }, query: 'cmmc assessment evid', hi: 3, about: { title: 'Ask AI as a labeled button', body: 'Same position, first on the row, but with the words “Ask AI”.', works: 'Says exactly what it does.', watch: 'Takes more room and draws more attention than the actions next to it.' } },
     { id: 'a-list', name: '→ for an action list', values: { 'results.actions': '→ for an action list' }, query: 'cmmc assessment evid', hi: 1, about: { title: 'Press → for an action list', body: 'Highlight a row and press →. The menu turns into its actions. ← goes back.', works: 'Every action reachable without a mouse.', watch: 'Nobody finds → on their own.' } },
     { id: 'a-more', name: '⋯ menu, changes by type', values: { 'results.actions': '⋯ menu on the row' }, query: 'cmmc assessment evid', hi: 1, about: { title: 'The menu changes with the type of result', body: 'Open ⋯ on a PreVeil file, then on the Slack row or the Kiwi trip. Anything that leaves PreVeil names the app.', works: 'People see before clicking whether they stay in PreVeil.' } },
     { id: 'a-preview', name: 'Preview beside the menu', values: { 'results.actions': 'Preview beside the menu' }, query: 'cmmc assessment evid', about: { title: 'Preview beside the menu', body: 'Highlighting a result shows a preview with the passage that matched.', works: 'Check it’s the right file before opening it.', watch: 'About 1000px wide; decrypting on every arrow key may be slow.' } },
@@ -823,7 +820,7 @@ function openLabel(it) {
 function rowButtons(it) {
   const b = [];
   if (V.ai !== 'Not in the menu' && it.k !== 'ai') {
-    const label = V.aiStyle === 'Labeled button';
+    const label = false;
     const blockedTip = 'Search can’t read inside CAD drawings, so AI can’t either.';
     if (it.cad) b.push(label ? `<button class="aipill blocked" data-act="aiblocked" title="${blockedTip}">${ic('sparkles')} Ask AI</button>` : `<button class="iconbtn blocked" data-act="aiblocked" data-tip="Ask AI isn’t available for CAD drawings">${ic('sparkles')}</button>`);
     else if (canAskAI(it)) b.push(label ? `<button class="aipill" data-act="ai">${ic('sparkles')} Ask AI</button>` : `<button class="iconbtn ai" data-act="ai" data-tip="Ask AI about this">${ic('sparkles')}</button>`);
