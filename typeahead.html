@@ -646,8 +646,8 @@ function readVariants() {
 // ===================================================================
 const SCENARIOS = [
   { section: 'Start here', items: [
-    { id: 'tour', name: 'Guided tour', sub: '8 quick quests · learn the prototype by playing it', tour: true, values: {},
-      about: { title: 'Guided tour', body: 'A step-by-step walkthrough. Each quest asks you to do one thing; it ticks off when you do it.' } },
+    { id: 'tour', name: 'Guided tour', sub: '8 short steps · learn the prototype by using it', tour: true, values: {},
+      about: { title: 'Guided tour', body: 'A step-by-step walkthrough. Each step asks you to do one thing and moves on when you do it.' } },
     { id: 'baseline', name: 'Baseline: Rena review direction', sub: 'Mail · Documents · Chats · Other, source on every row', values: {},
       about: { title: 'Baseline', body: 'Search covers PreVeil plus O365, Gmail, Slack, Zoom and Kiwi. Results are grouped, 2 per group, with the source under the date. Clicking a group opens the full results page.', lean: 'This is the starting point every other scenario changes one thing from.' } },
   ] },
@@ -1174,7 +1174,7 @@ function toast(msg) {
 }
 
 // ===================================================================
-// Guided tour: quests that tick off when you do the thing
+// Guided tour: steps that move on when you do the thing
 // ===================================================================
 const Tour = (() => {
   const steps = [
@@ -1187,10 +1187,10 @@ const Tour = (() => {
     { title: 'Jump to the full list', body: 'Click <b>Mail</b> in the chips at the top of the menu. It opens the full results page, already filtered.', target: '[data-testid="chip-mail"]', on: (ev) => ev === 'results' },
     { title: 'Try the other options', body: 'Every option from the Figma deep dive is a scenario in the left panel. Pick <b>Raman’s version: watch it flicker</b> under 4 · Did you mean.', target: '[data-testid="scenario-d-flicker"]', on: (ev, v) => ev === 'scenario' && v === 'd-flicker' },
   ];
-  let i = -1; let active = false; let xp = 0;
-  function start() { active = true; i = 0; xp = 0; draw(); }
+  let i = -1; let active = false;
+  function start() { active = true; i = 0; draw(); }
   function stop() { active = false; i = -1; $('quest').innerHTML = ''; clearHighlight(); }
-  function advance() { xp += 50; i++; draw(); render(); }
+  function advance() { i++; draw(); render(); }
   function event(ev, v) {
     if (!active || i < 0 || i >= steps.length) return;
     const s = steps[i];
@@ -1206,12 +1206,12 @@ const Tour = (() => {
     const q = $('quest');
     if (!active) { q.innerHTML = ''; return; }
     if (i >= steps.length) {
-      q.innerHTML = `<div class="quest win" data-testid="tour"><div class="qtop"><span>Tour complete</span><span class="xp">${xp} XP</span></div><div class="trophy">🏆</div><h3>You know the controls</h3><p>Keep exploring scenarios on the left. Every one starts from the baseline and changes one thing.</p><div class="qbtns" style="justify-content:center"><button class="btn" data-q="restart">Play again</button><button class="btn primary" data-q="close">Close</button></div></div>`;
+      q.innerHTML = `<div class="quest win" data-testid="tour"><div class="qtop"><span>Tour complete</span></div><div class="trophy">🏆</div><h3>You’re ready to explore</h3><p>Keep exploring scenarios on the left. Every one starts from the baseline and changes one thing.</p><div class="qbtns" style="justify-content:center"><button class="btn" data-q="restart">Start over</button><button class="btn primary" data-q="close">Close</button></div></div>`;
       clearHighlight(); return;
     }
     const s = steps[i];
     q.innerHTML = `<div class="quest" data-testid="tour">
-      <div class="qtop"><span>Quest ${i + 1} of ${steps.length}</span><span class="xp">${xp} XP</span></div>
+      <div class="qtop"><span>Step ${i + 1} of ${steps.length}</span></div>
       <h3>${s.title}</h3><p>${s.body}</p>
       <div class="pips">${steps.map((_, n) => `<i class="${n < i ? 'done' : n === i ? 'now' : ''}"></i>`).join('')}</div>
       <div class="qbtns">
