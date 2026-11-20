@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Semantic Search Demo Sandbox</title>
+<title>Semantic Search Design Sandbox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,400;0,600;0,700;1,400&family=Titillium+Web:wght@400;600&display=swap" rel="stylesheet">
@@ -251,7 +251,7 @@
 <div class="layout" id="layout">
   <aside class="panel" aria-label="Scenarios">
     <div class="panel-head">
-      <h1>Semantic Search Demo Sandbox</h1>
+      <h1>Semantic Search Design Sandbox</h1>
     </div>
     <div class="scenarios" id="scenarios"></div>
     <div class="about" id="about" data-testid="scenario-about"></div>
@@ -1332,7 +1332,7 @@ const Tour = (() => {
 // Boot
 // ===================================================================
 DesignRail.setup({
-  project: { id: 'semantic-search-typeahead', name: 'Semantic Search Demo Sandbox' },
+  project: { id: 'semantic-search-typeahead', name: 'Semantic Search Design Sandbox' },
   screens: [{ name: 'Inbox with type-ahead', path: '/inbox' }, { name: 'Search results', path: '/results' }],
   getPath: () => '/' + (S.page === 'results' ? 'results' : 'inbox'),
   scenarios: ALL_SC.filter(s => !s.tour).map(s => ({ name: s.name, description: s.about && s.about.body, values: s.values })),
