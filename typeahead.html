@@ -227,7 +227,7 @@
   .msg-ai .cite { display: inline-flex; gap: 4px; align-items: center; font-size: 11px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; color: var(--grey); background: var(--panel); }
   .msg-ai .cite svg.i { width: 11px; height: 11px; }
   .typing { color: var(--grey); font-size: 13px; }
-  .ai-input { border-top: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 8px; }
+  .ai-input { border-bottom: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 8px; }
   .ai-input input { flex: 1; border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 8px 10px; font: inherit; font-size: 13px; outline: 0; }
   .ai-input input:focus { border-color: var(--link); }
   .ai-input button { background: var(--nav); color: #fff; border-radius: var(--radius); padding: 0 12px; display: inline-flex; align-items: center; }
@@ -1244,7 +1244,7 @@ function openAI(opts) {
 function sendAI(text) {
   if (!text.trim() || AI.busy) return;
   AI.msgs.push({ who: 'user', text }); AI.busy = true; renderAI();
-  setTimeout(() => { AI.msgs.push({ who: 'ai', ...aiAnswer(text) }); AI.busy = false; renderAI(); }, 900);
+  setTimeout(() => { AI.msgs.push({ who: 'ai', ...aiAnswer(text) }); AI.busy = false; renderAI(); $('aiq').focus(); }, 900);
 }
 function renderAI() {
   const el = $('aipanel');
@@ -1257,8 +1257,8 @@ function renderAI() {
     : `<div class="msg-ai">${esc(m.text)}<ul>${m.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul><div class="cites">${m.cites.map(c => `<span class="cite">${ic(c.k)}${esc(c.t)}</span>`).join('')}</div></div>`).join('');
   const topics = !AI.msgs.length ? `<p class="ai-hint">Suggested</p><div class="ai-topics">${aiTopics().map(t => `<button class="ai-topic" data-topic="${esc(t)}">${ic('sparkles')}${esc(t)}</button>`).join('')}</div>` : '';
   el.innerHTML = `<div class="ai-head">${ic('sparkles')}<h2>Ask AI</h2><button class="iconbtn" data-aiclose aria-label="Close">${ic('x')}</button></div>
-    <div class="ai-body">${ctx}${topics}${convo}${AI.busy ? '<div class="typing">Reading…</div>' : ''}</div>
-    <form class="ai-input" data-aiform><input id="aiq" placeholder="${AI.question ? 'Ask a follow-up…' : 'Ask about this ' + ({ Mail: 'email', Documents: 'file', Other: AI.it.src === 'Kiwi' ? 'trip' : 'meeting' }[AI.it.g] || 'item') + '…'}" autocomplete="off" value="${AI.question && !AI.msgs.length ? esc(AI.question) : ''}"><button aria-label="Send">${ic('send')}</button></form>`;
+    <form class="ai-input" data-aiform><input id="aiq" placeholder="${AI.question ? 'Ask a follow-up…' : 'Ask about this ' + ({ Mail: 'email', Documents: 'file', Other: AI.it.src === 'Kiwi' ? 'trip' : 'meeting' }[AI.it.g] || 'item') + '…'}" autocomplete="off" value="${AI.question && !AI.msgs.length ? esc(AI.question) : ''}"><button aria-label="Send">${ic('send')}</button></form>
+    <div class="ai-body">${ctx}${topics}${convo}${AI.busy ? '<div class="typing">Reading…</div>' : ''}</div>`;
   const body = el.querySelector('.ai-body'); body.scrollTop = body.scrollHeight;
 }
 $('aipanel').addEventListener('click', e => {
