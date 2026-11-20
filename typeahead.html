@@ -205,6 +205,33 @@
   .tour-target { outline: 3px solid #8b84f0 !important; outline-offset: 3px; border-radius: 6px; animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { outline-color: #8b84f0; } 50% { outline-color: rgba(139, 132, 240, .25); } }
 
+  /* ---------- AI side panel ---------- */
+  .aipanel { position: fixed; top: 48px; right: 0; bottom: 0; width: 400px; max-width: 100vw; background: var(--surface); border-left: 1px solid var(--line); box-shadow: -8px 0 24px rgba(22,35,74,.10); z-index: 45; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s ease; }
+  .aipanel.open { transform: none; }
+  .ai-head { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .ai-head h2 { font-family: var(--f-head); font-weight: 600; font-size: 17px; margin: 0; flex: 1; }
+  .ai-head svg.i { color: var(--link-dark); }
+  .ai-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .ai-context { display: flex; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; background: var(--panel); }
+  .ai-context .t { font-weight: 600; font-size: 13px; }
+  .ai-context .s { font-size: 12px; color: var(--grey); }
+  .ai-hint { font-size: 12px; color: var(--grey); margin: 0; }
+  .ai-topics { display: flex; flex-direction: column; gap: 8px; }
+  .ai-topic { text-align: left; border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 9px 12px; font-size: 13px; background: #fff; display: flex; gap: 8px; align-items: center; }
+  .ai-topic:hover { border-color: var(--link); background: #f5fafc; }
+  .ai-topic svg.i { color: var(--link-dark); width: 14px; height: 14px; }
+  .msg-user { align-self: flex-end; background: #eaf1fb; border-radius: 10px 10px 2px 10px; padding: 8px 12px; font-size: 13px; max-width: 85%; }
+  .msg-ai { font-size: 13px; line-height: 1.5; }
+  .msg-ai ul { margin: 6px 0; padding-left: 18px; }
+  .msg-ai .cites { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .msg-ai .cite { display: inline-flex; gap: 4px; align-items: center; font-size: 11px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; color: var(--grey); background: var(--panel); }
+  .msg-ai .cite svg.i { width: 11px; height: 11px; }
+  .typing { color: var(--grey); font-size: 13px; }
+  .ai-input { border-top: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 8px; }
+  .ai-input input { flex: 1; border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 8px 10px; font: inherit; font-size: 13px; outline: 0; }
+  .ai-input input:focus { border-color: var(--link); }
+  .ai-input button { background: var(--nav); color: #fff; border-radius: var(--radius); padding: 0 12px; display: inline-flex; align-items: center; }
+
   @media (max-width: 900px) {
     .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; }
     .panel { max-height: 45vh; }
@@ -257,6 +284,7 @@
 </div>
 <button class="btn panel-toggle" id="panelToggle">Hide scenarios</button>
 <div id="quest"></div>
+<aside class="aipanel" id="aipanel" aria-label="Ask AI" data-testid="ai-panel"></aside>
 
 <script>
 /*
@@ -731,6 +759,7 @@ function applyScenario(sc, opts = {}) {
   S.scenario = sc.id;
   try { sessionStorage.setItem('ta:scenario', sc.id); } catch (e) {}
   clearInterval(S.playing); S.playing = null;
+  if (typeof AI !== 'undefined') { AI.open = false; renderAI(); }
   setValues(sc.values);
   Object.assign(S, { open: false, query: '', hi: -1, view: 'menu', moreFor: null, page: 'inbox', rpGroup: null, menuGroup: null, refine: null, srcFilter: null, scopeFolder: false, forceExact: false });
   input.value = '';
@@ -1025,7 +1054,7 @@ let NAVSNAP = [];
 function previewHtml() {
   const e = NAV[S.hi]; const it = e && e.it;
   if (!it) return `<div class="preview"><p class="hint" style="padding:0">Highlight a result to preview it.</p></div>`;
-  return `<div class="preview"><h3>${esc(it.t)}</h3><div class="pm">${esc(it.src || '')}${it.where ? ' · ' + esc(it.where) : ''}${it.d ? ' · ' + esc(it.d) : ''}</div><blockquote>“${boldify(it.s.replace(/^.*?·\s/, '').replace(/…/g, ''), search(S.query).pq.tokens)}”</blockquote><div class="pa"><button class="solid">${OUTSIDE(it.src || 'PreVeil') && it.src !== 'PreVeil AI' ? 'Open in ' + esc(openLabel(it)) : 'Open'}</button>${canAskAI(it) ? `<button class="aipill">${ic('sparkles')} Ask AI</button>` : ''}</div></div>`;
+  return `<div class="preview"><h3>${esc(it.t)}</h3><div class="pm">${esc(it.src || '')}${it.where ? ' · ' + esc(it.where) : ''}${it.d ? ' · ' + esc(it.d) : ''}</div><blockquote>“${boldify(it.s.replace(/^.*?·\s/, '').replace(/…/g, ''), search(S.query).pq.tokens)}”</blockquote><div class="pa"><button class="solid">${OUTSIDE(it.src || 'PreVeil') && it.src !== 'PreVeil AI' ? 'Open in ' + esc(openLabel(it)) : 'Open'}</button>${canAskAI(it) ? `<button class="iconbtn ai" data-aiitem="${it.id}" data-tip="Ask AI about this">${ic('sparkles')}</button>` : ''}</div></div>`;
 }
 
 function renderMenu() {
@@ -1132,10 +1161,10 @@ function activate(i) {
   if (e.kind === 'fill' || e.kind === 'dym') { input.value = e.text; S.query = e.text; S.hi = -1; S.view = 'menu'; input.focus(); render(); Tour.event('type', S.query); }
   else if (e.kind === 'seeall') openResults(e.group);
   else if (e.kind === 'item') toast(`Would open “${e.it.t}”${e.it.src && OUTSIDE(e.it.src) && e.it.src !== 'PreVeil AI' && e.it.k !== 'person' ? ' in ' + openLabel(e.it) : ''}`);
-  else if (e.kind === 'action') toast(e.a.disabled ? e.a.label : `Would do: ${e.a.label}`);
+  else if (e.kind === 'action') { if (/^Ask AI about/.test(e.a.label)) openAI({ it: NAVSNAP[S.hiSnap].it }); else toast(e.a.disabled ? e.a.label : `Would do: ${e.a.label}`); }
   else if (e.kind === 'refine') { S.refine = S.refine === e.label ? null : e.label; S.hi = -1; render(); }
   else if (e.kind === 'scopeFolder') { S.scopeFolder = true; render(); }
-  else if (e.kind === 'askai') toast('Would open the AI side panel with this question and suggested topics');
+  else if (e.kind === 'askai') openAI({ question: S.query.trim() });
 }
 $('menu').addEventListener('mousedown', e => e.preventDefault()); // keep focus in the input
 $('menu').addEventListener('click', e => {
@@ -1146,6 +1175,7 @@ $('menu').addEventListener('click', e => {
     if (V.chipClick === 'Opens the full results page' && g && V.second !== 'Tabs + filter chips' ) { openResults(g); return; }
     S.menuGroup = S.menuGroup === g ? null : g; S.refine = null; S.srcFilter = null; S.hi = -1; render(); Tour.event('menuGroup', g); return;
   }
+  const aiItem = t.closest('[data-aiitem]'); if (aiItem) { openAI({ it: ITEMS.find(x => x.id === aiItem.dataset.aiitem) }); return; }
   const jump = t.closest('[data-jump]'); if (jump) { openResults(jump.dataset.jump); return; }
   const grp = t.closest('[data-group]'); if (grp) { S.menuGroup = grp.dataset.group; S.hi = -1; render(); return; }
   const sc = t.closest('[data-scopechip]'); if (sc) { const map = { Mail: 'mail', Documents: 'docs', Chats: 'chats', Other: 'other' }; input.value = `in:${map[sc.dataset.scopechip]} `; S.query = input.value; render(); return; }
@@ -1158,9 +1188,10 @@ $('menu').addEventListener('click', e => {
     if (act.dataset.act === 'more') { S.moreFor = S.moreFor === id ? null : id; render(); Tour.event('more'); return; }
     const it = ITEMS.find(x => x.id === id) || {};
     const msgs = { open: `Would open “${it.t}” in ${openLabel(it)}`, preview: `Would preview “${it.t}”`, folder: 'Would show it in its folder', reply: 'Would start a reply', ai: `Would open the AI side panel about “${it.t}” with suggested topics`, aiblocked: 'Search can’t read inside CAD drawings, so AI can’t either.' };
+    if (act.dataset.act === 'ai') { openAI({ it }); return; }
     toast(msgs[act.dataset.act]); return;
   }
-  const al = t.closest('[data-act-label]'); if (al) { toast('Would do: ' + al.dataset.actLabel); S.moreFor = null; render(); return; }
+  const al = t.closest('[data-act-label]'); if (al) { const row = al.closest('[data-item]'); const it = ITEMS.find(x => x.id === (row && row.dataset.item)); if (it && /^Ask AI about/.test(al.dataset.actLabel)) { openAI({ it }); return; } toast('Would do: ' + al.dataset.actLabel); S.moreFor = null; render(); return; }
   const nav = t.closest('[data-nav]'); if (nav) { const i = +nav.dataset.nav; if (S.hi === i || NAV[i].kind !== 'item') activate(i); else { S.hi = i; render(); } return; }
   const sa = t.closest('[data-seeall]'); if (sa) openResults(sa.dataset.seeall || null);
 });
@@ -1179,6 +1210,62 @@ function toast(msg) {
   if (!el) { el = document.createElement('div'); el.id = 'toast'; el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#222;color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;z-index:70;max-width:90vw'; document.body.appendChild(el); }
   el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 2600);
 }
+
+
+// ===================================================================
+// AI side panel: opens with suggested topics; nothing happens until you pick or type one
+// ===================================================================
+const AI = { open: false, it: null, question: null, msgs: [], busy: false };
+function aiTopics() {
+  if (AI.question) return ['Answer using my mail and files', 'Which files would you use to answer this?', 'Only use documents from the CMMC Assessment 2026 folder'];
+  const it = AI.it;
+  if (it.g === 'Mail') return ['Summarize this thread', 'What is being asked of us?', 'List the deadlines mentioned', 'Draft a reply'];
+  if (it.g === 'Documents') return ['Summarize this file', 'Which CMMC controls does this cover?', 'What is missing before the assessment?', 'What changed in the latest version?'];
+  if (it.src === 'Zoom') return ['Summarize the meeting', 'What action items came up?', 'What was said about control 3.5.3?'];
+  if (it.src === 'Kiwi') return ['What is the itinerary?', 'When do I need to leave for the on-site?', 'What is booked and what is not?'];
+  return ['Summarize this', 'What should I do next?'];
+}
+function aiAnswer(q) {
+  const it = AI.it;
+  const rel = (...ids) => ids.map(id => ITEMS.find(x => x.id === id)).filter(Boolean);
+  if (AI.question) return { text: 'Based on your mail and files, three items still look open before the assessment:', bullets: ['MFA evidence for the CUI enclave (flagged in the mock assessment findings)', 'A second artifact for control 3.5.3, called “thin” in the readout', 'Three POA&M items that must close before Dec 5'], cites: rel('r1', 'r32', 'r13') };
+  if (it.g === 'Mail') return { text: `From “${it.t}”:`, bullets: ['Dana asks for evidence for all 110 controls by Dec 5.', 'The assessment team will sample 20 controls on site, Dec 9 and 10.', 'They want the SSP and the evidence binder ready for the kickoff.'], cites: [it, ...rel('r3')] };
+  if (it.g === 'Documents') return { text: `From “${it.t}”:`, bullets: ['Scope is the CUI enclave: 42 users and 6 servers.', 'Evidence for each control lives in CMMC Assessment 2026 / Evidence.', '3 POA&M items are still open and must close before the assessment.'], cites: [it, ...rel('r13')] };
+  if (it.src === 'Zoom') return { text: 'From the meeting transcript:', bullets: ['Evidence for 3.5.3 (MFA) was called thin; a second artifact is needed.', 'Marcus owns the MFA screenshots, due Nov 20.', 'Jordan will update the POA&M after the fixes.'], cites: [it, ...rel('r1')] };
+  if (it.src === 'Kiwi') return { text: 'From your Kiwi trip:', bullets: ['Flight to Huntsville on Dec 8, back Dec 11.', 'Hotel is booked near the C3PAO office.', 'On-site assessment days are Dec 9 and 10.'], cites: [it, ...rel('r3')] };
+  return { text: 'Here is a short summary.', bullets: [it.s.replace(/…/g, '')], cites: [it] };
+}
+function openAI(opts) {
+  AI.open = true; AI.it = opts.it || null; AI.question = opts.question || null; AI.msgs = []; AI.busy = false;
+  S.open = false; S.moreFor = null; input.blur(); render(); renderAI();
+  setTimeout(() => $('aiq') && $('aiq').focus(), 220);
+}
+function sendAI(text) {
+  if (!text.trim() || AI.busy) return;
+  AI.msgs.push({ who: 'user', text }); AI.busy = true; renderAI();
+  setTimeout(() => { AI.msgs.push({ who: 'ai', ...aiAnswer(text) }); AI.busy = false; renderAI(); }, 900);
+}
+function renderAI() {
+  const el = $('aipanel');
+  el.classList.toggle('open', AI.open);
+  if (!AI.open) return;
+  const ctx = AI.question
+    ? `<div class="ai-context">${ic('search')}<div><div class="t">${esc(AI.question)}</div><div class="s">Your search</div></div></div>`
+    : `<div class="ai-context">${ic(AI.it.k)}<div><div class="t">${esc(AI.it.t)}</div><div class="s">${esc(AI.it.src)}${AI.it.where ? ' · ' + esc(AI.it.where) : ''}</div></div></div>`;
+  const convo = AI.msgs.map(m => m.who === 'user' ? `<div class="msg-user">${esc(m.text)}</div>`
+    : `<div class="msg-ai">${esc(m.text)}<ul>${m.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul><div class="cites">${m.cites.map(c => `<span class="cite">${ic(c.k)}${esc(c.t)}</span>`).join('')}</div></div>`).join('');
+  const topics = !AI.msgs.length ? `<p class="ai-hint">Suggested</p><div class="ai-topics">${aiTopics().map(t => `<button class="ai-topic" data-topic="${esc(t)}">${ic('sparkles')}${esc(t)}</button>`).join('')}</div>` : '';
+  el.innerHTML = `<div class="ai-head">${ic('sparkles')}<h2>Ask AI</h2><button class="iconbtn" data-aiclose aria-label="Close">${ic('x')}</button></div>
+    <div class="ai-body">${ctx}${topics}${convo}${AI.busy ? '<div class="typing">Reading…</div>' : ''}</div>
+    <form class="ai-input" data-aiform><input id="aiq" placeholder="${AI.question ? 'Ask a follow-up…' : 'Ask about this ' + ({ Mail: 'email', Documents: 'file', Other: AI.it.src === 'Kiwi' ? 'trip' : 'meeting' }[AI.it.g] || 'item') + '…'}" autocomplete="off" value="${AI.question && !AI.msgs.length ? esc(AI.question) : ''}"><button aria-label="Send">${ic('send')}</button></form>`;
+  const body = el.querySelector('.ai-body'); body.scrollTop = body.scrollHeight;
+}
+$('aipanel').addEventListener('click', e => {
+  if (e.target.closest('[data-aiclose]')) { AI.open = false; renderAI(); return; }
+  const t = e.target.closest('[data-topic]'); if (t) sendAI(t.dataset.topic);
+});
+$('aipanel').addEventListener('submit', e => { e.preventDefault(); const q = $('aiq'); sendAI(q.value); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && AI.open && document.activeElement !== input) { AI.open = false; renderAI(); } });
 
 // ===================================================================
 // Guided tour: steps that move on when you do the thing
