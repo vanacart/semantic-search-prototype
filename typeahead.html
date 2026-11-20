@@ -613,7 +613,7 @@ function boldify(text, tokens) {
     return hit ? `<b>${esc(part)}</b>` : esc(part);
   }).join('');
 }
-// Raman's live "did you mean": a plain spell checker that doesn't know our words
+// Live "did you mean": a plain spell checker that doesn't know our words
 const SPELL = { cu: 'cut', cui: 'cue', m: 'me', mar: 'mar', asses: 'assets', c3pao: 'cpa', 'poa&m': 'poem', sprs: 'spurs', itar: 'sitar', dfars: 'dears', licnese: 'license', reponse: 'response', kestrel: 'kestrels', marki: 'marking', evid: 'avid', ssp: 'sap', cmmc: 'cmmc' };
 function liveDym(raw) {
   const toks = raw.toLowerCase().split(/\s+/).filter(Boolean);
@@ -635,7 +635,7 @@ function readVariants() {
   V.chipClick = DesignRail.variant('menu.chipClick', { label: 'Clicking a group', group: '3 · Filtering', options: ['Opens the full results page', 'Filters inside the menu'] });
   V.second = DesignRail.variant('menu.secondLayer', { label: 'Second layer', group: '3 · Filtering', options: ['Refine with one click', 'Tabs + filter chips', 'Source chips', 'Two rows of chips'] });
   V.suggested = DesignRail.flag('menu.suggestedFilters', { label: 'Suggest filters from what you type', group: '3 · Filtering', default: true });
-  V.dym = DesignRail.variant('typing.didYouMean', { label: 'Did you mean', group: '4 · Did you mean', options: ['Off: match through typos quietly', 'Live while typing (Raman)'] });
+  V.dym = DesignRail.variant('typing.didYouMean', { label: 'Did you mean', group: '4 · Did you mean', options: ['Off: match through typos quietly', 'Live while typing'] });
   V.source = DesignRail.variant('results.source', { label: 'Where it is from', group: '5 · Actions', options: ['Under the date', 'In the second line', 'Mark what leaves PreVeil'] });
   V.actions = DesignRail.variant('results.actions', { label: 'Reaching actions', group: '5 · Actions', options: ['Buttons on the highlighted row', '→ for an action list', '⋯ menu on the row', 'Preview beside the menu'] });
   V.ai = DesignRail.variant('ai.inMenu', { label: 'Ask AI in the menu', group: '5 · Actions', options: ['On one result', 'Also about the search', 'Not in the menu'] });
@@ -652,15 +652,15 @@ const SCENARIOS = [
       about: { title: 'Search results grouped by object', body: 'Search covers PreVeil plus O365, Gmail, Slack, Zoom and Kiwi. Results are grouped, 2 per group, with the source under the date. Clicking a group opens the full results page.' } },
   ] },
   { section: '1 · First click', items: [
-    { id: 'fc-c', name: 'C · Recently opened, plus where to search', values: {}, focus: true,
-      about: { title: 'Recently opened, plus where to search', body: 'Mail, Documents, Chats and Other shortcuts on top, then the last five things you opened from any source.', works: 'Covers re-finding and narrowing in one menu.', watch: 'More to read on first click.' } },
-    { id: 'fc-b', name: 'B · Recently opened', values: { 'menu.firstClick': 'Recently opened' }, focus: true,
-      about: { title: 'Recently opened', body: 'The last five things you opened. Most searches are re-finding something.', works: 'One click for the most common search.', watch: 'Needs a history of opened items. Can it stay on the device, encrypted?' } },
-    { id: 'fc-a', name: 'A · Example searches (today)', values: { 'menu.firstClick': 'Example searches' }, focus: true,
+    { id: 'fc-a', name: 'Example searches to try', values: { 'menu.firstClick': 'Example searches' }, focus: true,
       about: { title: 'Example searches', body: 'Three example searches that teach that you can describe what you want. Click one to try it.', works: 'Teaches the new behavior. Needs no history.', watch: 'The same three lines every time.' } },
-    { id: 'fc-d', name: 'D · Inside a folder', values: { 'menu.firstClick': 'Inside a folder' }, focus: true,
+    { id: 'fc-b', name: 'Recently opened items only', values: { 'menu.firstClick': 'Recently opened' }, focus: true,
+      about: { title: 'Recently opened', body: 'The last five things you opened. Most searches are re-finding something.', works: 'One click for the most common search.', watch: 'Needs a history of opened items. Can it stay on the device, encrypted?' } },
+    { id: 'fc-c', name: 'Recently opened, with Mail / Documents / Chats / Other shortcuts', values: {}, focus: true,
+      about: { title: 'Recently opened, plus where to search', body: 'Mail, Documents, Chats and Other shortcuts on top, then the last five things you opened from any source.', works: 'Covers re-finding and narrowing in one menu.', watch: 'More to read on first click.' } },
+    { id: 'fc-d', name: 'Inside a folder: search just that folder', values: { 'menu.firstClick': 'Inside a folder' }, focus: true,
       about: { title: 'Where you are', body: 'Inside a folder, the first option searches just that folder. Press Tab to scope the search.', works: 'Matches what people expect inside a folder.', watch: 'Two scopes to explain, and an obvious way back to everywhere.' } },
-    { id: 'fc-e', name: 'E · New, or still indexing', values: { 'menu.firstClick': 'New or still indexing' }, focus: true,
+    { id: 'fc-e', name: 'New user or still indexing: examples and progress', values: { 'menu.firstClick': 'New or still indexing' }, focus: true,
       about: { title: 'Someone new, or still indexing', body: 'Nothing opened yet, or the index is still building. Falls back to examples and is honest about progress.', works: 'Never an empty menu.', watch: 'Needs a rule for switching to recent items.' } },
   ] },
   { section: '2 · How many results', items: [
@@ -680,17 +680,17 @@ const SCENARIOS = [
     { id: 'f-refine', name: 'Second layer: refine with one click', values: { 'menu.chipClick': 'Filters inside the menu', 'menu.secondLayer': 'Refine with one click' }, query: 'cmmc assessment evid', group: 'Mail', about: { title: 'Refine with one click', body: 'After choosing Mail, the three filters most likely to help come first as rows, with how many results each leaves.', works: 'Fastest with the keyboard, and the counts show which filter helps.', watch: 'The suggested filters have to be good.' } },
     { id: 'f-tabs', name: 'Second layer: tabs + filter chips', values: { 'menu.chipClick': 'Filters inside the menu', 'menu.secondLayer': 'Tabs + filter chips' }, query: 'cmmc assessment evid', group: 'Mail', about: { title: 'Tabs for the group, chips for filters', body: 'Groups become tabs, so every chip left is a filter.', works: 'Tabs read as places; chips read as filters.', watch: 'Five tabs fit. A sixth group would not.' } },
     { id: 'f-src', name: 'Second layer: source chips', values: { 'menu.chipClick': 'Filters inside the menu', 'menu.secondLayer': 'Source chips' }, query: 'cmmc assessment evid', group: 'Mail', about: { title: 'Filter by where it lives', body: 'After Mail, the chips are the sources: PreVeil, O365, Gmail.', works: 'Answers “where is this from” before anyone opens a result.', watch: 'Hide when someone has only one source.' } },
-    { id: 'f-two', name: 'Second layer: two rows of chips', values: { 'menu.chipClick': 'Filters inside the menu', 'menu.secondLayer': 'Two rows of chips' }, query: 'cmmc assessment evid', group: 'Mail', about: { title: 'Two rows of chips (first version)', body: 'The first version: group chip, then From, Inbox, Has attachment, Date.', watch: 'Two rows of chips before any results.' } },
+    { id: 'f-two', name: 'Second layer: two rows of chips', values: { 'menu.chipClick': 'Filters inside the menu', 'menu.secondLayer': 'Two rows of chips' }, query: 'cmmc assessment evid', group: 'Mail', about: { title: 'Two rows of chips', body: 'A group chip, then a second row: From, Inbox, Has attachment, Date.', watch: 'Two rows of chips before any results.' } },
     { id: 'f-typed', name: 'Typed filters: in: and type:', values: {}, query: 'in:', about: { title: 'Typed filters', body: 'Type in: to see the places to search. Try “in:docs type:pdf ssp”.', works: 'Fast for power users, and the menu teaches the words.', watch: 'Hidden until someone types in:.' } },
     { id: 'f-sugg', name: 'Suggested filters from what you type', values: {}, query: 'dana pdf', about: { title: 'Suggested filters', body: 'The menu spots a person or a file type in the words and offers it as a filter row.', works: 'Turns plain words into a filter people can see and undo.', watch: 'Use it only for clear cases.' } },
   ] },
   { section: '4 · Did you mean', items: [
-    { id: 'd-flicker', name: 'Raman’s version: watch it flicker', values: { 'typing.didYouMean': 'Live while typing (Raman)' }, play: 'cui marking', about: { title: 'It changes on every keystroke', body: 'Typing “cui marking”, one key at a time. Watch the top row.', watch: 'The eye jumps to the top row each time, and the results move down and back up.' } },
-    { id: 'd-half', name: 'Raman’s version: half-typed words', values: { 'typing.didYouMean': 'Live while typing (Raman)' }, play: 'cmmc asses', about: { title: 'Half-typed words look like typos', body: 'At “asses” it suggests “assets”, while the results are already right.', watch: 'Pressing Tab here makes the search worse.' } },
-    { id: 'd-acro', name: 'Raman’s version: our words get “corrected”', values: { 'typing.didYouMean': 'Live while typing (Raman)' }, play: 'c3pao kickoff', about: { title: 'Our words get “corrected”', body: 'C3PAO becomes “cpa”. Also POA&M → poem, SPRS → spurs, ITAR → sitar, DFARS → dears.', watch: 'The words that matter most are the ones it gets wrong.' } },
-    { id: 'd-repeat', name: 'Raman’s version: repeats the results', values: { 'typing.didYouMean': 'Live while typing (Raman)' }, play: 'incident reponse plan', about: { title: 'It repeats what the results already found', body: 'Semantic search already matched the meaning, so the right file is first.', watch: 'The extra row pushes the right result down one place.' } },
-    { id: 'd-quiet', name: 'Preferred: match through typos quietly', values: {}, play: 'incident reponse plan', about: { title: 'Match through typos quietly', body: 'Same typing. No extra row. The right file is first and the matched words are bold.', works: 'Nothing jumps, nothing extra to read.' } },
-    { id: 'd-close', name: 'Preferred: when nothing matched exactly', values: {}, play: 'export licnese', about: { title: 'When nothing matched exactly', body: 'A quiet grey line says close matches are shown. Press Enter to see how the results page offers the exact words.', works: 'Honest without asking people to fix spelling mid-word.', watch: 'The grey line must only show when it’s true.' } },
+    { id: 'd-flicker', name: 'Live “did you mean”: changes on every keystroke', values: { 'typing.didYouMean': 'Live while typing' }, play: 'cui marking', about: { title: 'It changes on every keystroke', body: 'Typing “cui marking”, one key at a time. Watch the top row.', watch: 'The eye jumps to the top row each time, and the results move down and back up.' } },
+    { id: 'd-half', name: 'Live “did you mean”: half-typed words look like typos', values: { 'typing.didYouMean': 'Live while typing' }, play: 'cmmc asses', about: { title: 'Half-typed words look like typos', body: 'At “asses” it suggests “assets”, while the results are already right.', watch: 'Pressing Tab here makes the search worse.' } },
+    { id: 'd-acro', name: 'Live “did you mean”: acronyms get “corrected”', values: { 'typing.didYouMean': 'Live while typing' }, play: 'c3pao kickoff', about: { title: 'Our words get “corrected”', body: 'C3PAO becomes “cpa”. Also POA&M → poem, SPRS → spurs, ITAR → sitar, DFARS → dears.', watch: 'The words that matter most are the ones it gets wrong.' } },
+    { id: 'd-repeat', name: 'Live “did you mean”: repeats what results already show', values: { 'typing.didYouMean': 'Live while typing' }, play: 'incident reponse plan', about: { title: 'It repeats what the results already found', body: 'Semantic search already matched the meaning, so the right file is first.', watch: 'The extra row pushes the right result down one place.' } },
+    { id: 'd-quiet', name: 'No “did you mean”: typos matched quietly', values: {}, play: 'incident reponse plan', about: { title: 'Match through typos quietly', body: 'Same typing. No extra row. The right file is first and the matched words are bold.', works: 'Nothing jumps, nothing extra to read.' } },
+    { id: 'd-close', name: 'No “did you mean”: grey note when nothing matches exactly', values: {}, play: 'export licnese', about: { title: 'When nothing matched exactly', body: 'A quiet grey line says close matches are shown. Press Enter to see how the results page offers the exact words.', works: 'Honest without asking people to fix spelling mid-word.', watch: 'The grey line must only show when it’s true.' } },
   ] },
   { section: '5 · Actions', items: [
     { id: 'a-buttons', name: 'Buttons on the highlighted row', values: {}, query: 'cmmc assessment evid', hi: 1, about: { title: 'Buttons on the highlighted row', body: 'Use ↓ to move. The date swaps for buttons on the highlighted row. Press → for every action.', works: 'Easy to see; works with mouse and keys.', watch: 'Room for three buttons at most.' } },
@@ -931,8 +931,8 @@ function resultsHtml() {
   const res = search(q);
   const tokens = res.pq.tokens;
   let h = '';
-  // Raman's live did-you-mean
-  if (V.dym === 'Live while typing (Raman)') {
+  // Live did-you-mean
+  if (V.dym === 'Live while typing') {
     const s = liveDym(q);
     if (s) { const i = navPush({ kind: 'dym', text: s }); h += `<div class="dym ${S.hi === i ? 'hi' : ''}" data-nav="${i}" data-fill="${esc(s)}" data-testid="did-you-mean">${ic('search')}<span>Did you mean <b>${esc(s)}</b>?</span><span class="k">Tab</span></div>`; }
   }
@@ -947,7 +947,7 @@ function resultsHtml() {
   }
   // Quiet close-match line (preferred approach)
   const onlyFuzzy = [...res.fuzzyTokens].filter(t => !res.exactSomewhere.has(t));
-  if (V.dym !== 'Live while typing (Raman)' && onlyFuzzy.length && res.pq.tokens.length <= 2 && total) h += `<div class="note-line" data-testid="close-matches">No exact match for “${esc(onlyFuzzy.join(' '))}”. Showing close matches.</div>`;
+  if (V.dym !== 'Live while typing' && onlyFuzzy.length && res.pq.tokens.length <= 2 && total) h += `<div class="note-line" data-testid="close-matches">No exact match for “${esc(onlyFuzzy.join(' '))}”. Showing close matches.</div>`;
   // People
   if (res.people.length && !S.menuGroup) {
     h += `<div class="glabel"><span>People</span></div>`;
@@ -1184,7 +1184,7 @@ const Tour = (() => {
     { title: 'Find the actions', body: 'The highlighted row swaps its date for buttons. Press <kbd>→</kbd> to see every action for that result.', target: '.row.hi', on: (ev) => ev === 'actions' },
     { title: 'Come back', body: 'Actions change with the type of result. Press <kbd>←</kbd> to go back to the results.', target: '.actlist', on: (ev) => ev === 'back' },
     { title: 'Jump to the full list', body: 'Click <b>Mail</b> in the chips at the top of the menu. It opens the full results page, already filtered.', target: '[data-testid="chip-mail"]', on: (ev) => ev === 'results' },
-    { title: 'Try the other options', body: 'Every option from the Figma deep dive is a scenario in the left panel. Pick <b>Raman’s version: watch it flicker</b> under 4 · Did you mean.', target: '[data-testid="scenario-d-flicker"]', on: (ev, v) => ev === 'scenario' && v === 'd-flicker' },
+    { title: 'Try the other options', body: 'Every option from the Figma deep dive is a scenario in the left panel. Pick <b>Live “did you mean”: changes on every keystroke</b> under 4 · Did you mean.', target: '[data-testid="scenario-d-flicker"]', on: (ev, v) => ev === 'scenario' && v === 'd-flicker' },
   ];
   let i = -1; let active = false;
   function start() { active = true; i = 0; draw(); }
