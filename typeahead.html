@@ -642,7 +642,7 @@ function readVariants() {
 }
 
 // ===================================================================
-// Scenarios (left panel). Values not listed fall back to the baseline.
+// Scenarios (left panel). Values not listed use the first option of each variant (a starting point, not a recommendation).
 // ===================================================================
 const SCENARIOS = [
   { section: 'Start here', items: [
@@ -664,14 +664,15 @@ const SCENARIOS = [
       about: { title: 'Someone new, or still indexing', body: 'Nothing opened yet, or the index is still building. Falls back to examples and is honest about progress.', works: 'Never an empty menu.', watch: 'Needs a rule for switching to recent items.' } },
   ] },
   { section: '2 · How many results', items: [
-    { id: 'n-2', name: '2 per group (default)', values: {}, query: 'cmmc assessment evid', about: { title: '2 per group', body: 'Up to two from each group: Mail, Documents, Chats, Other.', works: 'Every group gets a turn and the list stays short.', watch: 'A strong third email loses its spot to a weaker file.' } },
+    { id: 'n-2', name: '2 per group', values: {}, query: 'cmmc assessment evid', about: { title: '2 per group', body: 'Up to two from each group: Mail, Documents, Chats, Other.', works: 'Every group gets a turn and the list stays short.', watch: 'A strong third email loses its spot to a weaker file.' } },
     { id: 'n-3', name: '3 per group', values: { 'menu.count': '3 per group' }, query: 'cmmc assessment evid', about: { title: '3 per group', body: 'Up to three from each group.', works: 'Shows at a glance where things live.', watch: 'With four groups this is about 715px tall, past the bottom of a laptop.' } },
     { id: 'n-top', name: 'Top result, then 2 per group', values: { 'menu.count': 'Top result + 2 per group' }, query: 'cmmc assessment evid', about: { title: 'Top result, then 2 per group', body: 'The single best match first, wherever it lives, then the groups.', works: 'The best answer is one Enter away, and it still groups.', watch: 'The tallest option. The top result must be clearly better.' } },
     { id: 'n-5', name: 'One list: 5', values: { 'menu.count': 'One list: 5' }, query: 'cmmc assessment evid', about: { title: '5 results', body: 'What the primer suggests (R17). Quickest to scan.', watch: 'Only one or two items from each group make it in.' } },
     { id: 'n-7', name: 'One list: 7', values: { 'menu.count': 'One list: 7' }, query: 'cmmc assessment evid', about: { title: '7 results', body: 'A middle option.', works: 'Room for mail, documents and a chat.' } },
     { id: 'n-10', name: 'One list: 10', values: { 'menu.count': 'One list: 10' }, query: 'cmmc assessment evid', about: { title: '10 results', body: 'Most choices before the full page.', watch: 'Runs past the bottom of a 13-inch laptop. Feels like a results page in a pop-up.' } },
     { id: 'n-person', name: 'A person takes a row', values: {}, query: 'dana', about: { title: 'A person takes a row', body: 'Searching a name: the person comes first, then grouped results.', works: 'Finding a person’s mail is one click.', watch: 'Decide whether people count toward the limit.' } },
-    { id: 'n-words', name: 'Heading wording: count on the link', values: { 'menu.headings': 'Mail · See all 21' }, query: 'cmmc assessment evid', about: { title: 'Heading wording', body: 'The count moves onto the link (“See all 12”). Compare with the default, “Mail (12)”.' } },
+    { id: 'n-brackets', name: 'Heading wording: count in brackets', values: {}, query: 'cmmc assessment evid', about: { title: 'Heading wording', body: 'The count sits next to the group name in brackets (“Mail (12)”). Compare with the count on the link.' } },
+    { id: 'n-words', name: 'Heading wording: count on the link', values: { 'menu.headings': 'Mail · See all 21' }, query: 'cmmc assessment evid', about: { title: 'Heading wording', body: 'The count moves onto the link (“See all 12”). Compare with the count in brackets, “Mail (12)”.' } },
   ] },
   { section: '3 · Filtering', items: [
     { id: 'f-jump', name: 'Chips jump to the full results page', values: {}, query: 'cmmc assessment evid', about: { title: 'A chip opens the full results page', body: 'Click Mail, Documents, Chats or Other at the top of the menu. The results page opens, already filtered, with that group’s filters ready.', works: 'The menu stays short; the full list is one click away.' } },
@@ -697,6 +698,7 @@ const SCENARIOS = [
     { id: 'a-list', name: '→ for an action list', values: { 'results.actions': '→ for an action list' }, query: 'cmmc assessment evid', hi: 1, about: { title: 'Press → for an action list', body: 'Highlight a row and press →. The menu turns into its actions. ← goes back.', works: 'Every action reachable without a mouse.', watch: 'Nobody finds → on their own.' } },
     { id: 'a-more', name: '⋯ menu, changes by type', values: { 'results.actions': '⋯ menu on the row' }, query: 'cmmc assessment evid', hi: 1, about: { title: 'The menu changes with the type of result', body: 'Open ⋯ on a PreVeil file, then on the Slack row or the Kiwi trip. Anything that leaves PreVeil names the app.', works: 'People see before clicking whether they stay in PreVeil.' } },
     { id: 'a-preview', name: 'Preview beside the menu', values: { 'results.actions': 'Preview beside the menu' }, query: 'cmmc assessment evid', about: { title: 'Preview beside the menu', body: 'Highlighting a result shows a preview with the passage that matched.', works: 'Check it’s the right file before opening it.', watch: 'About 1000px wide; decrypting on every arrow key may be slow.' } },
+    { id: 'a-src1', name: 'Source under the date', values: {}, query: 'cmmc assessment evid', about: { title: 'Source under the date', body: 'The source sits under the date on every row.', works: 'Quiet, and lines up so people can scan down the sources.', watch: 'Says where it is from, not where clicking takes you.' } },
     { id: 'a-src2', name: 'Source and location in the second line', values: { 'results.source': 'In the second line' }, query: 'cmmc assessment evid', about: { title: 'Source and location in the second line', body: 'The second line starts with the source and where it lives.', works: 'Answers “and the source”: the folder or channel.', watch: 'Less of the matched passage shows.' } },
     { id: 'a-src3', name: 'Mark what leaves PreVeil', values: { 'results.source': 'Mark what leaves PreVeil' }, query: 'cmmc assessment evid', hi: 2, about: { title: 'Mark anything that leaves PreVeil', body: 'Outside sources get an open-in-app icon. The highlighted row says where it opens.', works: 'Answers “where will this take me” at the moment of choosing.', watch: 'With many connected apps, most rows get the icon.' } },
     { id: 'a-aiq', name: 'Ask AI about the search', values: { 'ai.inMenu': 'Also about the search' }, query: 'what evidence is missing for the assessment?', about: { title: 'Ask AI about the search', body: 'When the search reads like a question, the last row offers to ask AI.', watch: 'Many searches look like questions, so this could get used a lot. AI never runs until someone clicks.' } },
@@ -945,7 +947,7 @@ function resultsHtml() {
   if (S.menuGroup && V.second === 'Tabs + filter chips') {
     h += `<div class="tabs">${['All', ...GROUPS].map(g => `<button class="tab ${(S.menuGroup || 'All') === g ? 'on' : ''}" data-chip="${g}">${g} (${g === 'All' ? total : counts[g]})</button>`).join('')}</div>`;
   }
-  // Quiet close-match line (preferred approach)
+  // Quiet close-match line
   const onlyFuzzy = [...res.fuzzyTokens].filter(t => !res.exactSomewhere.has(t));
   if (V.dym !== 'Live while typing' && onlyFuzzy.length && res.pq.tokens.length <= 2 && total) h += `<div class="note-line" data-testid="close-matches">No exact match for “${esc(onlyFuzzy.join(' '))}”. Showing close matches.</div>`;
   // People
