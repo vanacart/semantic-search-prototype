@@ -1,4 +1,4 @@
-# Semantic Search — clickable prototypes
+# Semantic Search Demo Sandbox
 
 A living prototype to explore how semantic search should integrate into our product.
 

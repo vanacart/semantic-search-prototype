@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Search Type-ahead</title>
+<title>Semantic Search Demo Sandbox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,400;0,600;0,700;1,400&family=Titillium+Web:wght@400;600&display=swap" rel="stylesheet">
@@ -251,8 +251,7 @@
 <div class="layout" id="layout">
   <aside class="panel" aria-label="Scenarios">
     <div class="panel-head">
-      <h1>Search type-ahead</h1>
-      <p>Deep dive 1 · pick a scenario, then click into the search box</p>
+      <h1>Semantic Search Demo Sandbox</h1>
     </div>
     <div class="scenarios" id="scenarios"></div>
     <div class="about" id="about" data-testid="scenario-about"></div>
@@ -791,7 +790,7 @@ function play(text) {
 // ===================================================================
 function renderPanel() {
   const html = SCENARIOS.map(sec => `<div class="sc-group">${esc(sec.section)}</div>` + sec.items.map(sc =>
-    `<button class="sc ${sc.tour ? 'tour' : ''} ${S.scenario === sc.id ? 'on' : ''}" data-sc="${sc.id}" data-testid="scenario-${sc.id}">${esc(sc.name)}${sc.sub ? `<small>${esc(sc.sub)}</small>` : ''}</button>`).join('')).join('');
+    `<button class="sc ${sc.tour ? 'tour' : ''} ${S.scenario === sc.id ? 'on' : ''}" data-sc="${sc.id}" data-testid="scenario-${sc.id}">${esc(sc.name)}</button>`).join('')).join('');
   $('scenarios').innerHTML = html;
   const sc = ALL_SC.find(x => x.id === S.scenario) || ALL_SC[1];
   const a = sc.about || {};
@@ -1333,7 +1332,7 @@ const Tour = (() => {
 // Boot
 // ===================================================================
 DesignRail.setup({
-  project: { id: 'semantic-search-typeahead', name: 'Semantic search: type-ahead menu' },
+  project: { id: 'semantic-search-typeahead', name: 'Semantic Search Demo Sandbox' },
   screens: [{ name: 'Inbox with type-ahead', path: '/inbox' }, { name: 'Search results', path: '/results' }],
   getPath: () => '/' + (S.page === 'results' ? 'results' : 'inbox'),
   scenarios: ALL_SC.filter(s => !s.tour).map(s => ({ name: s.name, description: s.about && s.about.body, values: s.values })),
